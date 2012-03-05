@@ -1,0 +1,25 @@
+{
+    "/" : "./public_assets",
+
+    "/css/app.css" : [
+        "./css/reset.css",
+        "./css/main.styl"
+    ],
+
+    "/js/app.js" : [
+        "./coffee"
+    ],
+
+    "/js/test.js" : {
+        "lib" : [
+            "./lib/jquery.js"
+        ],
+        "module": [
+            "./test/testbase.js",
+            {
+                "file":     "./test/test.coffee",
+                "minify": false
+            }
+        ]
+    }
+}
