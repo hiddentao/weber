@@ -1,4 +1,5 @@
 fs           = require('fs')
+path         = require('path')
 eco          = require('eco')
 uglify       = require('uglify-js')
 compilers    = require('./compilers')
@@ -7,12 +8,13 @@ Dependency   = require('./dependency')
 Stitch       = require('./stitch')
 {toArray}    = require('./utils')
 
+
 class Package
   constructor: (config = {}) ->
-    @identifier   = config.identifier
-    @libs         = toArray(config.libs)
-    @paths        = toArray(config.paths)
-    @dependencies = toArray(config.dependencies)
+    @identifier = config.id
+    @libs = config.input.lib ? []
+    @paths = config.input.module
+    @dependencies = []
 
   compileModules: ->
     @dependency or= new Dependency(@dependencies)
@@ -23,9 +25,8 @@ class Package
   compileLibs: ->
     (fs.readFileSync(path, 'utf8') for path in @libs).join("\n")
     
-  compile: (minify) ->
+  compile: () ->
     result = [@compileLibs(), @compileModules()].join("\n")
-    result = uglify(result) if minify
     result
     
   createServer: ->
