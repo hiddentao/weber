@@ -17,6 +17,7 @@
         "build" : "./app.js",
         "minify": false,
         "input" : {
+            "dependency" : [ "es5-shimify" ],
             "lib" : [ "./lib/jquery.js" ],
             "module": [ "./coffee" ]
         }

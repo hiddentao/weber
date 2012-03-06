@@ -16,9 +16,9 @@ class Js
         format: "[#{config.id}] <{{title}}> {{message}}"
     @minify = config.minify ? true
     @identifier = path.basename(config.id, ".js")
+    @dependencies = config.dependency ? []
     @libs = config.lib ? []
     @paths = config.module
-    @dependencies = []
 
   compileModules: ->
     @dependency or= new Dependency(@dependencies)

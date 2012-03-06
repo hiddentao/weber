@@ -1,0 +1,10 @@
+{
+  "author": "Ramesh Nair <ram@hiddentao.com> (http://hiddentao.com)",
+  "name": "weber-example-app",
+  "description": "Weber example app.",
+  "version": "0.0.1",
+  "dependencies": {
+      "es5-shimify": "latest"
+ }
+}
+

@@ -140,8 +140,9 @@ class Weber
                         id: urlpath
                         build: @options.docroot + urlpath
                         minify: true
-                        lib: {}
-                        module: {}
+                        dependency: []
+                        lib: []
+                        module: []
 
                     if Array.isArray(options)
                         item.module = options
@@ -156,7 +157,7 @@ class Weber
                             options.input =
                                 module: options.input
                         # check input types
-                        for inputType in ["lib","module"]
+                        for inputType in ["dependency", "lib","module"]
                             if options.input[inputType]
                                 item[inputType] = options.input[inputType]
 
@@ -220,6 +221,7 @@ sample_conf = """
     "/js/app.js" : {
         "build" : "./app.js",
         "input" : {
+            "dependency" : [ "es5-shimify" ],
             "lib" : [ "./lib/jquery.js" ],
             "module": [ "./coffee" ]
         }
