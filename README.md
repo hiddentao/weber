@@ -20,7 +20,7 @@ Once you have Weber configured you can launch server mode by typing the followin
 
     $ weber server
 
-This will launch a simple [Strata](http://stratajs.org/) server running on [http://localhost:9294]. But let's configure
+This will launch a simple [Strata](http://stratajs.org/) server running on **http://localhost:9294**. But let's configure
 Weber first. Goto the root of your project folder and type:
 
     $ weber init
@@ -63,7 +63,7 @@ The above configuration is put there by Weber just to show you what configuratio
 
 The first key-value pair is mandatory and tells Weber which folder to use as the document root when running in server mode. In
 this case Weber will expect an `index.html` file inside the `./public_assets` folder to serve up when the browser
-navigates to [http://localhost:9294]. By the way, Weber can be told to listen on a different port by adding a
+navigates to **http://localhost:9294**. By the way, Weber can be told to listen on a different port by adding a
 `port: <portnum` key in the config file above.
 
 The remaining key-value pairs in the config file tell Weber what to do when the browser visits the relative URLs
