@@ -31,20 +31,7 @@ class Weber
         conf:       './weber.json'
         port:       process.env.PORT or argv.port or 9294
         #
-        #  '/' : './public_assets'
-        #
-        #  '/filename.css' : ['input.css','input2.scss', 'input2.styl', ...]
-        #
-        #  '/filename.js' : [
-        #       'output' : './build/filename.js',
-        #       'input' : [
-        #           'input.js',
-        #           {
-        #               file: 'input2.coffee',
-        #               minify: false
-        #           }
-        #       ]
-        #   }
+        # See sample config at the bottom or run "weber init" to see sample config
         #
     }
 
@@ -76,12 +63,43 @@ class Weber
         strata.run(@app, port: @options.port)
 
 
-    build: ->
-        true
+    build: (log = true) ->
+        for urlpath, options of @options.js
+            fs.writeFileSync(options.build, js.createPackage(options).compile())
+
+        for urlpath, options of @options.css
+            fs.writeFileSync(options.build, css.createPackage(options).compile())
+
+        @logger.info "Built outputs" if log
 
 
     watch: ->
-        true
+        @build(false)
+        for urlpath, options of @options.js
+            all_inputs = [].concat options.lib, options.module
+            for f in all_inputs
+                f = path.resolve(f)
+                continue unless path.existsSync(f)
+                ( (buildConfig, fileToWatch) =>
+                    fs.watch fileToWatch, (e,f) =>
+                        @logger.debug "File changed: #{f}, rebuilding #{buildConfig.build}"
+                        fs.writeFileSync(buildConfig.build, js.createPackage(buildConfig).compile())
+                )(options, f)
+
+        for urlpath, options of @options.css
+            for f in options.input
+                path.resolve(f)
+                continue unless path.existsSync(f)
+                ( (buildConfig, fileToWatch) ->
+                    fs.watch fileToWatch, (e,f) ->
+                        @logger.debug "File changed: #{f}, rebuilding #{buildConfig.build}"
+                        fs.writeFileSync(buildConfig.build, css.createPackage(buildConfig).compile())
+                )(options, f)
+
+            output = if options.build? then path.resolve(options.build) else path.join(@options.docroot, urlpath)
+            fs.writeFileSync(output, css.createPackage(options).compile())
+
+        @logger.info "Watching for changes..."
 
 
     init: ->
@@ -103,7 +121,7 @@ class Weber
         if not slug.hasOwnProperty("/")
             throw "Root path '/' not specified in config"
         else
-            @options.docroot = "#{path.dirname(path.resolve(conf))}/#{slug["/"]}"
+            @options.docroot = path.join(path.dirname(path.resolve(conf)), slug["/"])
 
         @options.js = {}
         @options.css = {}
@@ -142,7 +160,7 @@ class Weber
                             if options.input[inputType]
                                 item[inputType] = options.input[inputType]
 
-                        item.build = options.build if options.build?
+                        item.build = path.resolve(options.build) if options.build?
 
                     else
                         @logger.warn "Skipping #{urlpath}, unable to parse options"
