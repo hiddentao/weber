@@ -1,3 +1,2 @@
-function testMe() {
-    alert(1);
-}
+testMe: ->
+    alert(1)

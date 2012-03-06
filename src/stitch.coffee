@@ -5,25 +5,31 @@ compilers    = require('./compilers')
 {flatten}    = require('./utils')
 
 class Stitch
-  constructor: (@paths = []) ->
-    @paths = (npath.resolve(path) for path in @paths)
-  
+  constructor: (@paths = [], @logger) ->
+    true
+
   resolve: ->
     flatten(@walk(path) for path in @paths)
 
   # Private
 
   walk: (path, parent = path, result = []) ->
-    return unless npath.existsSync(path)
-    for child in fs.readdirSync(path)
-      child = npath.join(path, child)
-      stat  = fs.statSync(child)
-      if stat.isDirectory()
-        @walk(child, parent, result)
-      else
-        module = new Module(child, parent)
+    resolvedPath = npath.resolve(path)
+    if not npath.existsSync(resolvedPath)
+        @logger.warn "Skipping #{path}, not found"
+        return []
+
+    stat = fs.statSync(resolvedPath)
+    if stat.isDirectory()
+        for child in fs.readdirSync(resolvedPath)
+            child = npath.join(resolvedPath, child)
+            @walk(child, resolvedPath, result)
+    else
+        module = new Module(resolvedPath, parent)
         result.push(module) if module.valid()
+
     result
+
 
 class Module
   constructor: (@filename, @parent) ->

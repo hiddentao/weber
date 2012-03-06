@@ -9,11 +9,12 @@ Stitch       = require('./stitch')
 {toArray}    = require('./utils')
 
 
-class Package
-  constructor: (config = {}) ->
+class Js
+  constructor: (config = {}, logger) ->
+    @logger = logger
     @identifier = config.id
-    @libs = config.input.lib ? []
-    @paths = config.input.module
+    @libs = config.lib ? []
+    @paths = config.module
     @dependencies = []
 
   compileModules: ->
@@ -28,15 +29,15 @@ class Package
   compile: () ->
     result = [@compileLibs(), @compileModules()].join("\n")
     result
-    
+
   createServer: ->
     (env, callback) =>
-      callback(200, 
-        'Content-Type': 'text/javascript', 
+      callback(200,
+        'Content-Type': 'text/javascript',
         @compile())
 
 module.exports = 
   compilers:  compilers
-  Package:    Package
-  createPackage: (config) -> 
-    new Package(config)
+  Js:    Js
+  createPackage: (args...) ->
+    new Js(args...)

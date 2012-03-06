@@ -6,20 +6,27 @@
         "./css/main.styl"
     ],
 
+    "/css/test.css" : [
+        "./css/test"
+    ],
+
     "/js/app.js" : [
         "./coffee"
     ],
 
     "/js/test.js" : {
-        "lib" : [
-            "./lib/jquery.js"
-        ],
-        "module": [
-            "./test/testbase.js",
-            {
-                "file":     "./test/test.coffee",
-                "minify": false
-            }
-        ]
+        "build" : "./test_build.js",
+        "input" : {
+            "lib" : [
+                "./lib/testrunner.js"
+            ],
+            "module": [
+                "testbase.js",
+                {
+                    "file":     "./test/test.coffee",
+                    "minify": false
+                }
+            ]
+        }
     }
 }

@@ -1,9 +1,9 @@
 path      = require('path')
 fs        = require('fs')
 optimist  = require('optimist')
-strata    = require('strata')
+strata   = require('strata')
 winston   = require('winston')
-js        = require('./package')
+js        = require('./js')
 css       = require('./css')
 
 
@@ -61,29 +61,23 @@ class Weber
     constructor: (options = {}) ->
         @options[key] = value for key, value of options
         @_loadConfig()
-        @app = new strata.Builder
 
     exec: (command = argv._[0]) ->
         return help() unless @[command]
         @[command]()
 
     server: ->
+        @app = new strata.Builder
         @app.use(strata.contentLength)
-        app_router = new strata.Router
+
+        @app.use(strata.static, @options.docroot, ['index.html', 'index.htm'])
 
         for urlpath, options of @options.js
-            app_router.get urlpath, js.createPackage(options).createServer()
+            @app.get urlpath, js.createPackage(options, logger).createServer()
 
         for urlpath, options of @options.css
-            app_router.get urlpath, css.createPackage(options).createServer()
+            @app.get urlpath, css.createPackage(options, logger).createServer()
 
-        for urlpath, folder of @options.static
-            ( (app, urlpath, folder) ->
-                app.map urlpath, ->
-                    app.use(strata.file, folder, ['index.html', 'index.htm'])
-            )(@app, urlpath, folder)
-
-        @app.run(app_router)
         strata.run(@app, port: @options.port)
 
 
@@ -97,10 +91,10 @@ class Weber
 
     init: ->
         if path.existsSync(@options.conf)
-            console.log "#{@options.conf} already exists"
+            logger.info "#{@options.conf} already exists"
         else
             fs.writeFileSync(@options.conf, sample_conf)
-            console.log "Wrote #{@options.conf}"
+            logger.info "Wrote #{@options.conf}"
 
 
     # Private
@@ -113,6 +107,8 @@ class Weber
 
         if not slug.hasOwnProperty("/")
             throw "Root path '/' not specified in config"
+        else
+            @options.docroot = "#{path.dirname(path.resolve(conf))}/#{slug["/"]}"
 
         @options.js = {}
         @options.css = {}
@@ -120,65 +116,74 @@ class Weber
 
         for urlpath, options of slug
             continue if 0 <= ["conf","port"].indexOf(urlpath)
+            if "/" isnt urlpath.charAt(0)
+                logger.warn "Skipping #{urlpath}, must start with /"
+                continue
 
             # what type of object is this?
             switch path.extname(urlpath)
                 when ".js"
-                    input =
+                    item =
+                        id: path.basename(urlpath, ".js")
+                        build: @options.docroot + urlpath
                         lib: []
                         module: []
 
                     if Array.isArray(options)
                         options.forEach ( (e,i,a) ->
-                            input.module.push
+                            item.module.push
                                 file: e
                         ), @
                     else if "object" is typeof options
-                        if not options.module?
+                        if not options.input?
                             logger.warn "Skipping #{urlpath}, no inputs found"
                             continue
 
+                        # if it's an array then treat as an array of modules
+                        if Array.isArray(options.input)
+                            options.input =
+                                module: options.input
+
                         for inputType in ["lib","module"]
-                            if options[inputType]
-                                options[inputType].forEach ( (e,i,a) ->
+                            if options.input[inputType]
+                                options.input[inputType].forEach (e,i,a) =>
                                     if "string" is typeof e
-                                        input[inputType].push
+                                        item[inputType].push
                                             file: e
                                     else if "object" is typeof e
-                                        input[inputType].push e
+                                        item[inputType].push e
                                     else
                                         logger.warn "Skipping #{inputType} #{e} for #{urlpath}"
-                                ), @
+
+                        item.build = options.build if options.build?
+
                     else
                         logger.warn "Skipping #{urlpath}, unable to parse options"
                         continue
 
-                    @options.js[urlpath] =
-                        id: path.basename(urlpath, ".js")
-                        input: input
-
+                    @options.js[urlpath] = item
                     logger.info "JS: #{urlpath}"
 
                 #css
                 when ".css"
-                    if 0 >= options.length
-                        logger.warn "Skipping #{urlpath}, no inputs found"
-                        continue
+                    item =
+                        build: @options.docroot + urlpath
+                        input: options
 
-                    @options.css[urlpath] = options
+                    if not Array.isArray(options) and "object" is typeof options
+                        if not options.input? or not Array.isArray(options.input)
+                            logger.warn "Skipping #{urlpath}, no inputs found"
+                            continue
+                        item.build = options.build if options.build?
+                        item.input = options.input
 
+                    @options.css[urlpath] = item
                     logger.info "CSS: #{urlpath}"
-
-                # static folder
-                when ""
-                    if path.existsSync(options)
-                        @options.static[urlpath] = options
-                    else
-                        logger.warn "Folder not found: #{options}"
 
                 # unrecognized path type
                 else
-                    logger.warn "Unrecognized path type: #{urlpath}"
+                    if "/" isnt urlpath
+                        logger.warn "Unrecognized path type: #{urlpath}"
 
 
 
@@ -197,21 +202,28 @@ sample_conf = """
         "./css/main.styl"
     ],
 
+    "/css/test.css" : [
+        "./css/test"
+    ],
+
     "/js/app.js" : [
         "./coffee"
     ],
 
     "/js/test.js" : {
-        "lib" : [
-            "./lib/testrunner.js"
-        ],
-        "module": [
-            "testbase.js",
-            {
-                "file":     "./test/test.coffee",
-                "minify": false
-            }
-        ]
+        "build" : "./test_build.js",
+        "input" : {
+            "lib" : [
+                "./lib/testrunner.js"
+            ],
+            "module": [
+                "testbase.js",
+                {
+                    "file":     "./test/test.coffee",
+                    "minify": false
+                }
+            ]
+        }
     }
 }
 

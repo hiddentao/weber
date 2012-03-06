@@ -1,24 +1,32 @@
-{resolve} = require('path')
+fs = require('fs')
+path = require('path')
 compilers = require('./compilers')
+Stitch = require('./stitch')
 
 class CSS
-  constructor: (path) ->
-    try
-      @path = require.resolve(resolve(path))
-    catch e
-    
+  constructor: (config = {}, @logger) ->
+    @inputs = new Stitch(config.input ? [], @logger)
+
   compile: ->
-    return unless @path
-    delete require.cache[@path]
-    require(@path)
-  
+    ret = []
+    try
+        modules = @inputs.resolve()
+        modules.forEach (e) ->
+            if 0 <= ["css","styl"].indexOf(e.ext)
+                delete require.cache[e.filename]
+                ret.push require(e.filename)
+    catch err
+        @logger.warn err
+    ret.join("\n")
+
+
   createServer: ->
     (env, callback) =>
-      callback(200, 
-        'Content-Type': 'text/css', 
+      callback(200,
+        'Content-Type': 'text/css',
         @compile())
-      
-module.exports = 
+
+module.exports =
   CSS: CSS
-  createPackage: (path) ->
-    new CSS(path)
+  createPackage: (args...) ->
+    new CSS(args...)
