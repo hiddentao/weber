@@ -1,4 +1,1 @@
-$ = jQuery
-
-$ ->
-    testMe()
+$("#appjs").text("Bootstrap js loaded!")

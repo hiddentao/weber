@@ -25,14 +25,18 @@ class Stitch
             child = npath.join(resolvedPath, child)
             @walk(child, resolvedPath, result)
     else
-        module = new Module(resolvedPath, parent)
+        # for logic in Module to work correctly we need to set the parent to the parent folder. this happens
+        # whenever a file (rather than a folder) is provided given in the @paths array.
+        parent = npath.dirname(resolvedPath) if path is parent
+
+        module = new Module(path, resolvedPath, parent)
         result.push(module) if module.valid()
 
     result
 
 
 class Module
-  constructor: (@filename, @parent) ->
+  constructor: (@unresolvedFilename, @filename, @parent) ->
     @ext = npath.extname(@filename).slice(1)
     @id  = modulerize(@filename.replace(npath.join(@parent, '/'), ''))
     

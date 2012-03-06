@@ -121,34 +121,26 @@ class Weber
                     item =
                         id: urlpath
                         build: @options.docroot + urlpath
-                        lib: []
-                        module: []
+                        minify: true
+                        lib: {}
+                        module: {}
 
                     if Array.isArray(options)
-                        options.forEach ( (e,i,a) ->
-                            item.module.push
-                                file: e
-                        ), @
+                        item.module = options
                     else if "object" is typeof options
                         if not options.input?
                             @logger.warn "Skipping #{urlpath}, no inputs found"
                             continue
-
+                        # minification
+                        item.minify = options.minify if options.minify?
                         # if it's an array then treat as an array of modules
                         if Array.isArray(options.input)
                             options.input =
                                 module: options.input
-
+                        # check input types
                         for inputType in ["lib","module"]
                             if options.input[inputType]
-                                options.input[inputType].forEach (e,i,a) =>
-                                    if "string" is typeof e
-                                        item[inputType].push
-                                            file: e
-                                    else if "object" is typeof e
-                                        item[inputType].push e
-                                    else
-                                        @logger.warn "Skipping #{inputType} #{e} for #{urlpath}"
+                                item[inputType] = options.input[inputType]
 
                         item.build = options.build if options.build?
 
@@ -164,12 +156,14 @@ class Weber
                     item =
                         id: urlpath
                         build: @options.docroot + urlpath
+                        minify: true
                         input: options
 
                     if not Array.isArray(options) and "object" is typeof options
                         if not options.input? or not Array.isArray(options.input)
                             @logger.warn "Skipping #{urlpath}, no inputs found"
                             continue
+                        item.minify = options.minify if options.minify?
                         item.build = options.build if options.build?
                         item.input = options.input
 
@@ -198,29 +192,27 @@ sample_conf = """
         "./css/main.styl"
     ],
 
-    "/css/test.css" : [
-        "./css/test"
-    ],
+    "/css/test.css" : {
+        "minify": false,
+        "input" : [
+            "./css/test"
+        ]
+    },
 
-    "/js/app.js" : [
-        "./coffee"
-    ],
+    "/js/app.js" : {
+        "build" : "./app.js",
+        "input" : {
+            "lib" : [ "./lib/jquery.js" ],
+            "module": [ "./coffee" ]
+        }
+    },
 
     "/js/test.js" : {
-        "build" : "./test_build.js",
-        "input" : {
-            "lib" : [
-                "./lib/testrunner.js"
-            ],
-            "module": [
-                "testbase.js",
-                {
-                    "file":     "./test/test.coffee",
-                    "minify": false
-                }
-            ]
-        }
+        "minify": false,
+        "input": [
+            "./test/testbase.js",
+            "./test/test.coffee"
+        ]
     }
 }
-
 """

@@ -1,2 +1,2 @@
-testMe: ->
-    alert(1)
+$ ->
+    (require('testbase'))('Test js loaded!')

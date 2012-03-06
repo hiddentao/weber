@@ -4,12 +4,24 @@
 <head>
     <title></title>
     <link href="/css/app.css" rel="stylesheet"/>
+    <link href="/css/test.css" rel="stylesheet"/>
 </head>
 <body>
 
-This is a test!!!
+<div id="appjs"></div>
 
-<script type="text/javascript" src="/coffee/app.js"></script>
+<div id="testjs"></div>
+
+
+<script type="text/javascript" src="/js/app.js"></script>
+<script type="text/javascript" src="/js/test.js"></script>
+<script type="text/javascript">
+    $(document).ready(function(){
+        app.require("bootstrap");
+        test.require("test");
+    });
+</script>
+
 
 </body>
 </html>

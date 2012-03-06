@@ -6,27 +6,28 @@
         "./css/main.styl"
     ],
 
-    "/css/test.css" : [
-        "./css/test"
-    ],
+    "/css/test.css" : {
+        "minify": false,
+        "input" : [
+            "./css/test"
+        ]
+    },
 
-    "/js/app.js" : [
-        "./coffee"
-    ],
+    "/js/app.js" : {
+        "build" : "./app.js",
+        "minify": false,
+        "input" : {
+            "lib" : [ "./lib/jquery.js" ],
+            "module": [ "./coffee" ]
+        }
+    },
 
     "/js/test.js" : {
-        "build" : "./test_build.js",
-        "input" : {
-            "lib" : [
-                "./lib/testrunner.js"
-            ],
-            "module": [
-                "testbase.js",
-                {
-                    "file":     "./test/test.coffee",
-                    "minify": false
-                }
-            ]
-        }
+        "minify": false,
+        "input": [
+            "./test/testbase.js",
+            "./test/test.coffee"
+        ]
     }
 }
+

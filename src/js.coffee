@@ -2,7 +2,7 @@ fs           = require('fs')
 path         = require('path')
 eco          = require('eco')
 uglify       = require('uglify-js')
-tracer    = require('tracer')
+tracer       = require('tracer')
 compilers    = require('./compilers')
 stitch       = require('../assets/stitch')
 Dependency   = require('./dependency')
@@ -14,6 +14,7 @@ class Js
   constructor: (config = {}) ->
     @logger = tracer.colorConsole
         format: "[#{config.id}] <{{title}}> {{message}}"
+    @minify = config.minify ? true
     @identifier = path.basename(config.id, ".js")
     @libs = config.lib ? []
     @paths = config.module
@@ -21,15 +22,22 @@ class Js
 
   compileModules: ->
     @dependency or= new Dependency(@dependencies)
-    @stitch       = new Stitch(@paths)
+    @stitch       = new Stitch( @paths, @logger )
     @modules      = @dependency.resolve().concat(@stitch.resolve())
     stitch(identifier: @identifier, modules: @modules)
     
   compileLibs: ->
-    (fs.readFileSync(path, 'utf8') for path in @libs).join("\n")
-    
+    ret = []
+    try
+        libs = new Stitch( @libs, @logger ).resolve()
+        ret = (fs.readFileSync(e.filename) for e in libs)
+    catch err
+        @logger.warn err
+    ret.join("\n")
+
   compile: () ->
     result = [@compileLibs(), @compileModules()].join("\n")
+    result = uglify(result) if false isnt @minify
     result
 
   createServer: ->
