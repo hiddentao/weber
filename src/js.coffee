@@ -2,6 +2,7 @@ fs           = require('fs')
 path         = require('path')
 eco          = require('eco')
 uglify       = require('uglify-js')
+tracer    = require('tracer')
 compilers    = require('./compilers')
 stitch       = require('../assets/stitch')
 Dependency   = require('./dependency')
@@ -10,9 +11,10 @@ Stitch       = require('./stitch')
 
 
 class Js
-  constructor: (config = {}, logger) ->
-    @logger = logger
-    @identifier = config.id
+  constructor: (config = {}) ->
+    @logger = tracer.colorConsole
+        format: "[#{config.id}] <{{title}}> {{message}}"
+    @identifier = path.basename(config.id, ".js")
     @libs = config.lib ? []
     @paths = config.module
     @dependencies = []

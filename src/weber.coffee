@@ -1,19 +1,12 @@
 path      = require('path')
 fs        = require('fs')
 optimist  = require('optimist')
-strata   = require('strata')
-winston   = require('winston')
+strata    = require('strata')
+tracer    = require('tracer')
 js        = require('./js')
 css       = require('./css')
 
 
-
-logger = new (winston.Logger)({
-    transports: [
-      new (winston.transports.Console)(colorize: true),
-    ]
-  });
-logger.cli()
 
 
 argv = optimist.usage([
@@ -59,6 +52,8 @@ class Weber
         (new @(options)).exec(command)
 
     constructor: (options = {}) ->
+        @logger = tracer.colorConsole
+            format: '<{{title}}> {{message}}'
         @options[key] = value for key, value of options
         @_loadConfig()
 
@@ -73,10 +68,10 @@ class Weber
         @app.use(strata.static, @options.docroot, ['index.html', 'index.htm'])
 
         for urlpath, options of @options.js
-            @app.get urlpath, js.createPackage(options, logger).createServer()
+            @app.get urlpath, js.createPackage(options).createServer()
 
         for urlpath, options of @options.css
-            @app.get urlpath, css.createPackage(options, logger).createServer()
+            @app.get urlpath, css.createPackage(options).createServer()
 
         strata.run(@app, port: @options.port)
 
@@ -91,10 +86,10 @@ class Weber
 
     init: ->
         if path.existsSync(@options.conf)
-            logger.info "#{@options.conf} already exists"
+            @logger.info "#{@options.conf} already exists"
         else
             fs.writeFileSync(@options.conf, sample_conf)
-            logger.info "Wrote #{@options.conf}"
+            @logger.info "Wrote #{@options.conf}"
 
 
     # Private
@@ -117,14 +112,14 @@ class Weber
         for urlpath, options of slug
             continue if 0 <= ["conf","port"].indexOf(urlpath)
             if "/" isnt urlpath.charAt(0)
-                logger.warn "Skipping #{urlpath}, must start with /"
+                @logger.warn "Skipping #{urlpath}, must start with /"
                 continue
 
             # what type of object is this?
             switch path.extname(urlpath)
                 when ".js"
                     item =
-                        id: path.basename(urlpath, ".js")
+                        id: urlpath
                         build: @options.docroot + urlpath
                         lib: []
                         module: []
@@ -136,7 +131,7 @@ class Weber
                         ), @
                     else if "object" is typeof options
                         if not options.input?
-                            logger.warn "Skipping #{urlpath}, no inputs found"
+                            @logger.warn "Skipping #{urlpath}, no inputs found"
                             continue
 
                         # if it's an array then treat as an array of modules
@@ -153,37 +148,38 @@ class Weber
                                     else if "object" is typeof e
                                         item[inputType].push e
                                     else
-                                        logger.warn "Skipping #{inputType} #{e} for #{urlpath}"
+                                        @logger.warn "Skipping #{inputType} #{e} for #{urlpath}"
 
                         item.build = options.build if options.build?
 
                     else
-                        logger.warn "Skipping #{urlpath}, unable to parse options"
+                        @logger.warn "Skipping #{urlpath}, unable to parse options"
                         continue
 
                     @options.js[urlpath] = item
-                    logger.info "JS: #{urlpath}"
+                    @logger.info "JS: #{urlpath}"
 
                 #css
                 when ".css"
                     item =
+                        id: urlpath
                         build: @options.docroot + urlpath
                         input: options
 
                     if not Array.isArray(options) and "object" is typeof options
                         if not options.input? or not Array.isArray(options.input)
-                            logger.warn "Skipping #{urlpath}, no inputs found"
+                            @logger.warn "Skipping #{urlpath}, no inputs found"
                             continue
                         item.build = options.build if options.build?
                         item.input = options.input
 
                     @options.css[urlpath] = item
-                    logger.info "CSS: #{urlpath}"
+                    @logger.info "CSS: #{urlpath}"
 
                 # unrecognized path type
                 else
                     if "/" isnt urlpath
-                        logger.warn "Unrecognized path type: #{urlpath}"
+                        @logger.warn "Unrecognized path type: #{urlpath}"
 
 
 

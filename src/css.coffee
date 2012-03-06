@@ -1,10 +1,13 @@
 fs = require('fs')
 path = require('path')
+tracer    = require('tracer')
 compilers = require('./compilers')
 Stitch = require('./stitch')
 
 class CSS
-  constructor: (config = {}, @logger) ->
+  constructor: (config = {}) ->
+    @logger = tracer.colorConsole
+        format: "[#{config.id}] <{{title}}> {{message}}"
     @inputs = new Stitch(config.input ? [], @logger)
 
   compile: ->
