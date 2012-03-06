@@ -1,3 +1,8 @@
 *.iml
 .idea
 node_modules
+
+example/public_assets/css/app.css
+example/public_assets/css/test.css
+example/app.js
+example/public_assets/js/test.js
