@@ -45,6 +45,7 @@ You will now find a file called `weber.json`:
         "/js/app.js" : {
             "build" : "./app.js",
             "input" : {
+                "dependency" : [ "es5-shimify" ],
                 "lib" : [ "./lib/jquery.js" ],
                 "module": [ "./coffee" ]
             }
@@ -74,8 +75,8 @@ builds and outputs these files using the information provided in the config file
 
 *  `/css/test.css` - concatenates all CSS and Stylus files in `./css/test`.
 
-*  `/js/apps.js` - concatenates `./lib/jquery.js` with all the *modularized* versions of all the code in `./coffee`
-and then minifies the final result.
+*  `/js/apps.js` - concatenates the npm module `es5-shimify` with `./lib/jquery.js` with all the *modularized*
+versions of all the code in `./coffee` and then minifies the final result.
 
 *  `/js/test.js` - concatenates *modularized* versions of `./test/testbase.js` and `./test/test.coffee`.
 
