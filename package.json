@@ -2,7 +2,7 @@
   "author": "Ramesh Nair <ram@hiddentao.com> (http://hiddentao.com)",
   "name": "weber",
   "description": "A tool for compiling scripts, stylesheets and templates when developing Javascript web apps.",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "homepage": "https://github.com/hiddentao/weber",
     "licenses":
       [{
@@ -13,7 +13,7 @@
     "url": "git://github.com/hiddentao/weber.git"
   },
   "engines": {
-    "node": ">= 0.6.11"
+    "node": ">= 0.6"
   },
   "main" : "./lib/weber.js",
   "bin": {
