@@ -123,6 +123,15 @@ files as and when necessary:
     $ weber watch
 
 
+## Supported file types
+
+At present Weber is able to handle the following file extensions:
+
+*  [coffee](http://coffeescript.org/) / js
+*  css / [styl](http://learnboost.github.com/stylus/) with built-in support for [nib](https://github.com/visionmedia/nib).
+*  tmpl / [.eco](https://github.com/sstephenson/eco) (.eco) / [.jeco](http://spinejs.com/docs/views)
+
+
 ## Future improvements and contributions
 
 I welcome all feedback contributions to making Weber better.

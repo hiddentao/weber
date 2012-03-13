@@ -50,13 +50,15 @@ require.extensions['.tmpl'] = (module, filename) ->
   
 try
   stylus = require('stylus')
+  nib = require('nib')
   
   compilers.styl = (path) ->
     content = fs.readFileSync(path, 'utf8')
     result = ''
     stylus(content)
       .include(dirname(path))
-      .render((err, css) -> 
+      .use(nib())
+      .render((err, css) ->
         throw err if err
         result = css
       )
