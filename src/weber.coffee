@@ -75,6 +75,8 @@ class Weber
 
     watch: ->
         @build(false)
+        logger = @logger
+
         for urlpath, options of @options.js
             all_inputs = [].concat options.lib, options.module
             for f in all_inputs
@@ -82,7 +84,7 @@ class Weber
                 continue unless path.existsSync(f)
                 ( (buildConfig, fileToWatch) =>
                     fs.watch fileToWatch, (e,f) =>
-                        @logger.debug "File changed: #{f}, rebuilding #{buildConfig.build}"
+                        logger.debug "File changed: #{f}, rebuilding #{buildConfig.build}"
                         fs.writeFileSync(buildConfig.build, js.createPackage(buildConfig).compile())
                 )(options, f)
 
@@ -92,7 +94,7 @@ class Weber
                 continue unless path.existsSync(f)
                 ( (buildConfig, fileToWatch) ->
                     fs.watch fileToWatch, (e,f) ->
-                        @logger.debug "File changed: #{f}, rebuilding #{buildConfig.build}"
+                        logger.debug "File changed: #{f}, rebuilding #{buildConfig.build}"
                         fs.writeFileSync(buildConfig.build, css.createPackage(buildConfig).compile())
                 )(options, f)
 
