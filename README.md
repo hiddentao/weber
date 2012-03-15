@@ -1,10 +1,9 @@
 # Introduction
 
-**Weber** (German for *weaver*) is a fork of [Hem](https://github.com/maccman/hem) and is useful for compiling,
-concatenating and minifying scripts, stylesheets and templates when building Javascript web applications.
+Weber (a fork of [Hem](https://github.com/maccman/hem)) compiles, concatenates and minifies scripts, stylesheets and templates **on-the-fly**.
 
-Weber improves upon Hem by allowing for more flexibility in terms of input sources and multiple build targets. If Hem
-is good enough for you then stick with it. Otherwise have a look at what Weber can offer you below.
+Weber improves upon Hem by providing more flexibility in terms of input sources and multiple build targets. If Hem
+is good enough for you then stick with it. Otherwise take a look at what Weber can offer you below.
 
 # Installation
 
@@ -20,8 +19,10 @@ Once you have Weber configured you can launch server mode by typing the followin
 
     $ weber server
 
-This will launch a simple [Strata](http://stratajs.org/) server running on **http://localhost:9294**. But let's configure
-Weber first. Goto the root of your project folder and type:
+This will launch a simple [Strata](http://stratajs.org/) server running on **http://localhost:9294**. 
+This mode allows you to quickly test out your scripts, stylesheets and templates and rapidly iterate with them.
+
+But let's configure Weber first. Goto the root of your project folder and type:
 
     $ weber init
 
