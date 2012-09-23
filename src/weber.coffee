@@ -121,7 +121,7 @@ class Weber
         # parse it
 
         if not slug.hasOwnProperty("/")
-            throw "Root path '/' not specified in config"
+            @options.docroot = path.dirname(path.resolve(conf))
         else
             @options.docroot = path.join(path.dirname(path.resolve(conf)), slug["/"])
 

@@ -39,7 +39,7 @@ class Module
   constructor: (@unresolvedFilename, @filename, @parent) ->
     @ext = npath.extname(@filename).slice(1)
     @id  = modulerize(@filename.replace(npath.join(@parent, '/'), ''))
-    
+
   compile: ->
     compilers[@ext](@filename)
     

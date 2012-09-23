@@ -63,9 +63,10 @@ You will now find a file called `weber.json`:
 
 The above configuration is put there by Weber just to show you what configuration options are available.
 
-The first key-value pair is mandatory and tells Weber which folder to use as the document root when running in server mode. In
+The first key-value pair tells Weber which folder to use as the document root when running in server mode. In
 this case Weber will expect an `index.html` file inside the `./public_assets` folder to serve up when the browser
-navigates to **http://localhost:9294**. By the way, Weber can be told to listen on a different port by adding a
+navigates to **http://localhost:9294**. If this setting is ommitted then Weber will assume the document root to be the
+folder containing `weber.json`. By the way, Weber can be told to listen on a different port by adding a
 `port: <portnum` key in the config file above.
 
 The remaining key-value pairs in the config file tell Weber what to do when the browser visits the relative URLs

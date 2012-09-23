@@ -32,10 +32,14 @@ module.exports = (request, parent = repl) ->
   # Find package root relative to localModules folder
   while dir not in invalidDirs and dir not in modulePaths
     dir = dirname(dir)
-  
+
   throw("Load path not found for #{filename}") if dir in invalidDirs
-    
-  id = filename.replace("#{dir}/", '')
+
+  # if it's an npm module then use module name as id
+  if dir in modulePaths
+    id = request
+  else
+    id = filename.replace("#{dir}/", '')
 
   [modulerize(id, filename), filename]
   

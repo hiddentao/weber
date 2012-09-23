@@ -4,7 +4,7 @@
 build = (watch = false) ->
     args = ['-c', '-o', 'lib', 'src']
     args.unshift('-w') if watch
-    coffee = spawn 'coffee', args
+    coffee = spawn 'node_modules/.bin/coffee', args
     coffee.stderr.on 'data', (data) ->
         process.stderr.write data.toString()
     coffee.stdout.on 'data', (data) ->
