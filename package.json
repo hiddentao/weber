@@ -22,7 +22,7 @@
   "dependencies": {
       "eco": "1.1.0-rc-3",
       "uglify-js": "~1.2.5",
-      "clean-css": "~0.3.2",
+      "clean-css": "~4.2.1",
       "fast-detective": "~0.0.2",
       "optimist": "~0.3.1",
       "coffee-script" : "~1.2.0",
