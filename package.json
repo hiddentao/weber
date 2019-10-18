@@ -21,7 +21,7 @@
   },
   "dependencies": {
       "eco": "1.1.0-rc-3",
-      "uglify-js": "~1.2.5",
+      "uglify-js": "~3.6.2",
       "clean-css": "~0.3.2",
       "fast-detective": "~0.0.2",
       "optimist": "~0.3.1",
